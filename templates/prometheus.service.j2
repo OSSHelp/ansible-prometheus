@@ -1,0 +1,30 @@
+[Unit]
+Description=Prometheus
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ prometheus_user }}
+Group={{ prometheus_group }}
+{% if prometheus_environment_file is defined %}
+EnvironmentFile=-{{ prometheus_environment_file }}
+{% endif %}
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStart=/usr/local/bin/prometheus \
+  --config.file={{ prometheus_dirs.config }}/prometheus.yml \
+  --storage.tsdb.path={{ prometheus_dirs.data }} {% if prometheus_environment_file is defined %}$PROMETHEUS_PARAMS{% else %} \
+  --storage.tsdb.retention.time={{ prometheus_retention.time }} \
+  --storage.tsdb.retention.size={{ prometheus_retention.size }} \
+  --web.listen-address={{ prometheus_listen }} \
+  --web.external-url={{ prometheus_external_url }}{% endif %}
+
+LimitNOFILE=65000
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectHome=true
+SyslogIdentifier={{ prometheus_service_name }}
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,30 @@
+---
+
+prometheus_setup: full
+prometheus_version: 2.37.1
+
+prometheus_service_name: prometheus
+prometheus_user: prometheus
+prometheus_group: prometheus
+prometheus_dirs:
+  config: /etc/prometheus
+  data: /var/lib/prometheus
+
+prometheus_listen: 0.0.0.0:9090
+prometheus_alertmanager_config: []
+prometheus_external_url: ''
+prometheus_metrics_path: "/{{ ( prometheus_external_url + '/metrics' ) | regex_replace('^(.*://)?(.*?)/') }}"
+prometheus_retention:
+  time: 30d
+  size: 0
+
+prometheus_global_params:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+prometheus_scrape_configs:
+  - job_name: "{{ prometheus_service_name }}"
+    metrics_path: "{{ prometheus_metrics_path }}"
+    static_configs:
+      - targets:
+          - localhost:9090

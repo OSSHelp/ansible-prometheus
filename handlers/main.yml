@@ -1,0 +1,16 @@
+---
+
+- name: reload prometheus unit
+  systemd:
+    daemon_reload: true
+
+- name: reload prometheus service
+  become: true
+  systemd:
+    name: "{{ prometheus_service_name }}"
+    state: reloaded
+
+- name: restart prometheus service
+  systemd:
+    name: "{{ prometheus_service_name }}"
+    state: restarted

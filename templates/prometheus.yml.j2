@@ -1,0 +1,15 @@
+global:
+  {{ prometheus_global_params | to_nice_yaml(indent=2) | indent(2, False) }}
+
+rule_files:
+  - {{ prometheus_dirs.config }}/rules/alerting/*.yml
+  - {{ prometheus_dirs.config }}/rules/recording/*.yml
+
+{% if prometheus_alertmanager_config | length > 0 %}
+alerting:
+  alertmanagers:
+  {{ prometheus_alertmanager_config | to_nice_yaml(indent=2) | indent(2,False) }}
+{% endif %}
+
+scrape_configs:
+  {{ prometheus_scrape_configs | to_nice_yaml(indent=2) | indent(2,False) }}
